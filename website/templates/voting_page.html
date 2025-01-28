@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Player Of The Week</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            background-color: #f0f0f0;
+            }
+
+        h1 {
+            margin-top: 20px;
+            }
+
+        .players-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .player {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+            }
+
+
+        .player img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            }
+
+         button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+
+        button:hover {
+            background-color: #218838;
+            }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            }
+
+
+
+    </style>
+
+</head>
+<body>
+
+ <h1>Vote for the Best Player of the Week</h1>
+    <div class="players-container">
+        {% for player in players %}
+        <div class="players">
+            <img src="{{ player.photo.url }}" alt="{{ player.name }}" style="width: 250px; height: 250px;">
+            <p>{{ player.name }}</p>
+            <button onclick="vote({{ player.id }})">Vote</button>
+        </div>
+        {% endfor %}
+    </div>
+    <h2>Results</h2>
+    <ul>
+        {% for player in players %}
+        <li>{{ player.name }}: {{ player.votes }} votes</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        function vote(playerId) {
+            fetch(`/vote/${playerId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your vote.');
+            });
+        }
+    </script>
+
+
+</body>
+</html>
